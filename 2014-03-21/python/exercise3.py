@@ -121,4 +121,4 @@ solid_model_3D = STRUCT ([floor0,floor1,floor2,floor3])
 solid_model_3D = COLOR([0.7,0.7,0.7])(solid_model_3D)
 
 
-VIEW(solid_model_3)
+VIEW(solid_model_3D)

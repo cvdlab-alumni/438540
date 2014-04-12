@@ -65,7 +65,7 @@ for i in range(1,13):
 	scala = STRUCT([scala,T(2)(0.5*i)(gradino)])
 
 atrio = CUBOID([15.5,4,3])
-scala = STRUCT([scala,T(1)(11.25)(scala),T(2)(6)(atrio)])
+scala = STRUCT([scala,T(1)(11.5)(scala),T(2)(6)(atrio)])
 scalaA = R([1,2])(1.765*PI)(scala)
 scalaA = T([1,2])([-29.5,-21.5])(scalaA)
 scalaB = R([1,2])(0.765*PI)(scala)
