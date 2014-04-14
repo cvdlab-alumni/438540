@@ -1,7 +1,7 @@
 import sys
 sys.path.insert(0, 'py/')
 from importer import *
-from exercize3 import *
+from exercise3 import *
 from random import randint
 
 model = neighborhood

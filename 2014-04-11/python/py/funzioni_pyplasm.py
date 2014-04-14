@@ -40,17 +40,30 @@ def F_estrude(obj,spessore):
 	return PROD([obj,Q(spessore)])
 
 """ Funzioni che lavorano su elementi circolari o geometrici  """
-# funzione che ritorna il perimetro di un disco; parametri: raggio del disco e numero dei lati 
-def F_perim(raggio,lati): 
+# funzione che ritorna il perimetro di un disco; parametri: raggio del disco, numero dei lati e i radianti
+def F_circonferenza(raggio,lati,rad): 
 	def f(p):
 		return [raggio*COS(p[0]),raggio*SIN(p[0])]
-	return MAP(f)(INTERVALS(2*PI)(lati))
+	return MAP(f)(INTERVALS(rad*PI)(lati))
 
 # funzione che ritorna un disco pieno; parametri: raggio del disco, numero dei lati, radianti da coprire
 def F_disco(raggio,lati,rad):
 	def f(p):
 		u,v = p
 		return [v*raggio*COS(u),v*raggio*SIN(u)]
+	return MAP(f)(PROD([INTERVALS(rad*PI)(lati), INTERVALS(1)(1)]))
+
+# funzione che ritorna un'ellisse; parametri: dimensione del raggio lungo X, dimensione del raggio lungo Y, # dei lati e  radianti
+def F_ellisse1(raggioX,raggioY,lati,rad):
+	def f(p):
+		return [raggioX*COS(p[0]),raggioY*SIN(p[0])]
+	return MAP(f)(INTERVALS(rad*PI)(lati))
+
+# funzione che ritorna un ellisse piena; parametri: dimensione del raggio lungo X, dimensione del raggio lungo Y, # dei lati e  radianti
+def F_ellisse2(raggioX,raggioY,lati,rad):
+	def f(p):
+		u,v = p
+		return [v*raggioX*COS(u),v*raggioY*SIN(u)]
 	return MAP(f)(PROD([INTERVALS(rad*PI)(lati), INTERVALS(1)(1)]))
 
 # funzione che ritorna un anello; parametri: raggio esterno dell'anello, raggio interno dell'anello e i lati
