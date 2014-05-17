@@ -137,4 +137,6 @@ piano = STRUCT([latoSud,T([1,2])([-4,.3])(latoNord),T([1,2])([-4.3,-8.3])(ingres
 palazzina = STRUCT([pianoTerra, T(3)(3.2)(piano),T(3)(6.4)(piano),T(3)(9.6)(piano),
 	T([1,2,3])([-14.1,-8.3,12.6])(tetto),T([1,2,3])([-5.3,2,12.6])(casetta),T([1,2,3])([8.5,-7,12.6])(bandiera)])
 palazzina = COLOR([.7,.7,.7])(palazzina)
-VIEW(SKEL_1(palazzina))
+
+#VIEW(palazzina)
+#VIEW(SKEL_1(palazzina))

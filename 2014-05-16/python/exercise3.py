@@ -29,6 +29,10 @@ def Marge_View_Remove(master,diagram,toMerge,toRemove):
 	master = Remove_Cells(master,toRemove)
 	return master
 
+
+
+" esempio d'uso delle funzioni definite sopra "
+
 master = assemblyDiagramInit([5,5,2])([[.3,3.2,.1,5,.3],[.3,4,.1,2.9,.3],[.3,2.7]])
 VIEW_Numbering(master)
 master = Remove_Cells(master,[13,33,17,37])

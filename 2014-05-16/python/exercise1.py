@@ -1,4 +1,4 @@
-import sys
+gimport sys
 sys.path.insert(0, 'py/')
 from importer import *
 
