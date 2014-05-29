@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <title>Example - Semplify Tree</title> 
+  <style>
+    body{
+      margin: 0;
+      overflow: hidden;
+    }
+  </style> 
+  </head>
+  <body> 
+    <!-- JavaScript libraries -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> 
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/stats.js/r11/Stats.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script> 
+    <script src="assets/libs/TrackballControls.js"></script>
+    <!-- Javascript code that runs our Three.js examples --> 
+    <script>
+      // once everything is loaded, we run our Three.js stuff.
+      $(function () {
+
+        var stats = initStats();
+
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var scene = new THREE.Scene();
+
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        // create a inspectedCamera
+        var inspectedCamera = new THREE.PerspectiveCamera(10, window.innerWidth / window.innerHeight, 10, 100);
+
+        // create a render and set the size
+        var renderer = new THREE.WebGLRenderer();
+
+        // create trackball controls
+        var trackballControls = new THREE.TrackballControls(camera);
+
+        renderer.setClearColor(new THREE.Color(0xEEEEEE));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        // create the ground plane
+        var planeGeometry = new THREE.PlaneGeometry(50,50);
+        var planeMaterial = new THREE.MeshBasicMaterial({color: 0x177245});
+        var plane = new THREE.Mesh(planeGeometry,planeMaterial);
+        plane.rotation.x = -0.5 * Math.PI
+        planeMaterial.side = THREE.DoubleSide;
+
+
+        // add the plane to the scene
+        scene.add(plane);
+
+        // create a cilinder
+        var cylinderGeometry = new THREE.CylinderGeometry(3,4,26,20);
+        var cylinderMaterial = new THREE.MeshBasicMaterial({color: 0x704214});
+        var cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
+
+        // add the cube to the scene
+        scene.add(cylinder);
+
+        var sphereGeometry = new THREE.SphereGeometry(7,15,15);
+        var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x228b22, wireframe: false});
+        var sphere = new THREE.Mesh(sphereGeometry,sphereMaterial);
+
+        // add the sphere to the scene
+        scene.add(sphere);
+
+        // position and point the camera to the center of the scene
+        camera.position.set(-80,40,80);
+        camera.up = new THREE.Vector3(0,1,0);
+        camera.lookAt(scene.position);
+
+        // position and point the camera to the center of the scene
+        inspectedCamera.position.set(30,40,-30);
+        inspectedCamera.up = new THREE.Vector3(0,1,0);
+        inspectedCamera.lookAt(scene.position);
+
+        var axisHelper = new THREE.AxisHelper(10);
+        scene.add(axisHelper);
+
+        // add cameraHelper
+        var cameraHelper = new THREE.CameraHelper(inspectedCamera);
+        scene.add(inspectedCamera);
+        scene.add(cameraHelper);
+
+        // add the output of the renderer to the html element
+        $('body').append(renderer.domElement);
+
+        var controls = new function () {
+          this.asseX = 0.5;
+          this.asseY = 0.5;
+          this.showAxisHelper = true;
+          this.moveCamera = true;
+          this.inspectedCamera = false;
+        };
+
+        var gui = new dat.GUI();
+        var positionX_control = gui.add(controls, 'asseX',0,1.);
+        var positionZ_control = gui.add(controls, 'asseY',0,1.);
+        var axis_control = gui.add(controls, 'showAxisHelper');
+        var camera_control = gui.add(controls, 'moveCamera');
+        var cameraControl = gui.add(controls, 'inspectedCamera');
+
+        // call the render function
+        var alfa = 0
+        
+        render();
+
+        var renderCamera = camera;
+
+        axis_control.onChange(function (value) {
+        axisHelper.visible = value;
+        });
+
+        camera_control.onChange(function (value) {
+            camera_control.moveCamera = value
+        });
+
+        cameraControl.onChange(function (value) {
+          renderCamera = value ? inspectedCamera : camera;
+        });
+
+
+
+        function render() {
+          stats.update();
+          trackballControls.update();
+          cameraHelper.update();
+
+          alfa += 0.02;
+
+          if (controls.moveCamera) {
+            camera.position.x = 80*Math.cos(alfa);
+            camera.position.z = 80*Math.sin(alfa);
+            camera.lookAt(scene.position);
+          }
+
+          cylinder.position.x = -25 + 50*controls.asseX;
+          cylinder.position.z = -25 + 50*controls.asseY;
+          cylinder.position.y = 13;
+
+          sphere.position.x = -25 + 50*controls.asseX;
+          sphere.position.z = -25 + 50*controls.asseY;
+          sphere.position.y = 22;
+
+
+          // render using requestAnimationFrame
+          requestAnimationFrame(render);
+          renderer.render(scene, renderCamera);
+        }
+
+        function initStats() {
+        var stats = new Stats();
+        stats.setMode(0); // 0: fps, 1: ms
+        $('body').append(stats.domElement);
+        return stats;
+      }
+      });
+    </script>  
+ </body>
+</html>
