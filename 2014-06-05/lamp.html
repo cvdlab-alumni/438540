@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+ <head> 
+  <title>Pixar Lamp</title> 
+  <style>
+    body{
+      margin: 0;
+      overflow: hidden;
+    }
+  </style> 
+  </head> 
+  <body>
+
+    <!-- JavaScript libraries -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> 
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r67/three.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/stats.js/r11/Stats.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script>
+    <script src="assets/libs/TrackballControls.js"></script>
+    <script src="assets/libs/tween.min.js"></script>
+    <script src="assets/libs/keyframe.js"></script>
+    <script type="text/javascript" src="assets/fonts/helvetiker_regular.typeface.js"></script> 
+    <script type="text/javascript" src="assets/fonts/helvetiker_bold.typeface.js"></script> 
+    <!-- Javascript code that runs our Three.js examples --> 
+    <script>
+
+        //document.write('<embed src="Pixar_Intro.mp4" ></embed>');
+      // once everything is loaded, we run our Three.js stuff.
+      $(function () {
+
+        var stats = initStats();
+
+        // creo la scena
+        var scene = new THREE.Scene();
+
+        // creo la camera per la visuale
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        // posiziono la camera
+        camera.position.set(0,-120,60);
+        camera.up = new THREE.Vector3(0,0,1);
+        camera.lookAt(scene.position);
+
+        // creo il trackball controls
+        var trackballControls = new THREE.TrackballControls(camera);
+
+        // creo il rendere per la scena
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setClearColor(new THREE.Color(0xeeeeee));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMapEnabled = true;
+
+        // Aggiungo gli assi alla scena
+        var axisHelper = new THREE.AxisHelper(3);
+        scene.add(axisHelper);
+
+        // aggiungo una directionalLight sulla sfera da eliminare
+        var directionalLight = new THREE.DirectionalLight("#ffffff");
+        directionalLight.position.set(0, 0, 200);
+        directionalLight.intensity = .3;
+        scene.add(directionalLight);
+
+
+        // aggiungo alla scena un piano
+        var planeGeometry = new THREE.PlaneGeometry(200,100,20,10);
+        var planeMaterial = new THREE.MeshLambertMaterial({ color: 0x779bcb, wireframe:false });
+        var plane = new THREE.Mesh(planeGeometry,planeMaterial);
+        planeMaterial.side = THREE.DoubleSide;
+        plane.receiveShadow = true;
+        scene.add(plane);
+
+
+        // Compongo la lampada
+        var lamp = new THREE.Object3D();
+        scene.add(lamp);
+
+        // creo la base della lampada
+        var material = new THREE.MeshPhongMaterial({specular: 0xffffff, color: 0xc0c0c0, shininess: 100, metal: true});
+        material.side = THREE.DoubleSide;
+
+        var baseGeometry = new THREE.CylinderGeometry(5,5,1,30,10,false);
+        var base = new THREE.Mesh(baseGeometry,material);
+        base.rotation.x = 0.5*Math.PI;
+        base.position.z = 0.5;
+        lamp.add(base);
+
+        // funzione che ritorna il giunto formato da sfera e braccio
+        function mkJoint(radius, height) {
+            var joint = new THREE.Object3D();
+            var sphereGeometry = new THREE.SphereGeometry(radius,16,16);
+            var sphere = new THREE.Mesh(sphereGeometry,material);
+            joint.add(sphere);
+
+            var armGeometry = new THREE.CylinderGeometry(radius, radius, height,16,16,false);
+            var arm = new THREE.Mesh(armGeometry,material);
+            arm.position.set(0,0,5);
+            arm.rotation.x = 0.5 *Math.PI;
+            sphere.add(arm);
+
+            var hook = new THREE.Object3D();
+            arm.add(hook);
+            hook.position.set(0,height/2 + radius,0);
+
+            joint.sphere = sphere;
+            joint.arm = arm;
+            joint.hook = hook;
+
+            return joint;
+        }
+
+        // funzione che ritorna il giunto formato da una sfera, plaffoniera e lampadina
+        function mkJoint2(radius) {
+            var joint = new THREE.Object3D();
+            var sphereGeometry = new THREE.SphereGeometry(radius,16,16);
+            var sphere = new THREE.Mesh(sphereGeometry,material);
+            joint.add(sphere);
+
+            var lampShadeGeometry1 = new THREE.SphereGeometry(5,20,20,0,2*Math.PI,2,.85);
+            var lampShade1 = new THREE.Mesh(lampShadeGeometry1,material); 
+            sphere.add(lampShade1);
+
+            var lampShadeGeometry2 = new THREE.SphereGeometry(1.7,20,20,0,2*Math.PI,2,1.2);
+            var lampShade2 = new THREE.Mesh(lampShadeGeometry2,material); 
+            lampShade2.scale.y=1.7;
+            lampShade2.position.set(0,-3.55,0);
+            lampShade1.add(lampShade2);
+            lampShade1.position.y = 6.5;
+
+            var bulbM = new THREE.MeshLambertMaterial( {
+                color: 0xffffff, opacity: 0.3, transparent: true } );
+            var bulbGeometry = new THREE.SphereGeometry(2,20,20,0,2*Math.PI,0,0.82*Math.PI);
+            var bulb = new THREE.Mesh(bulbGeometry,bulbM); 
+            bulb.position.y = -3;
+            lampShade1.add(bulb);
+            var suppG = new THREE.CylinderGeometry(1.2, 0.6, 2, 12, 12);
+            var suppM = new THREE.MeshPhongMaterial(0x7a7a7a);
+            var supp = new THREE.Mesh(suppG,suppM);
+            bulb.add(supp);
+            supp.position.y = -2.6;
+            
+            joint.bulb = bulb;
+
+            return joint;
+        }
+
+        // vado a istanziare i giunti e li posiziono
+        var joint1 = mkJoint(1,8);
+        joint1.position.z = 2;
+        lamp.add(joint1);
+
+        var joint2 = mkJoint(1,8);
+        joint2.rotation.x = -0.5*Math.PI;
+        joint1.hook.add(joint2);
+
+        var joint3 = mkJoint2(1);
+        joint2.hook.add(joint3);
+
+        // vado a istanziare la luce della lampadina e la vado a posizionare
+        var light = new THREE.SpotLight( 0xffcc11 );
+        joint3.bulb.add(light);
+
+        light.intensity = 3;
+        light.castShadow = true;
+        light.angle = Math.PI/2;
+        light.shadowMapWidth = 2048;
+        light.shadowMapHeight = 2048;
+        light.shadowCameraNear = 0.1;
+        light.shadowCameraFar = 1000;
+        light.shadowCameraFov = 30;
+
+        var target = new THREE.Object3D();
+        joint3.bulb.add(target);
+        target.position.y = 100;
+        light.target = target;
+
+        var pointLight = new THREE.PointLight(0xffcc11, 5 , 5);
+        joint3.bulb.add(pointLight);
+        pointLight.position.y = 1;
+
+
+        // vado a creare la scritta CVDLAB
+        var text = new THREE.Object3D
+        var textMaterial = new THREE.MeshPhongMaterial({color: 0x000000});        
+        var options = {
+          size: 25,
+          height: 5,
+          font: "helvetiker",
+          weight: "normal",
+          curveSegments: 20
+        };        
+        var cvd_Geo = new THREE.TextGeometry("c v d ", options);
+        var l_Geo = new THREE.TextGeometry(" l ", options);
+        var ab_Geo = new THREE.TextGeometry(" a b ", options);
+        
+        var cvd_text = new THREE.Mesh(cvd_Geo,textMaterial);
+            text.add(cvd_text);
+            cvd_text.castShadow = true;
+        var l_text = new THREE.Mesh(l_Geo,textMaterial);
+            text.add(l_text);
+            l_text.castShadow = true;
+            l_text.position.x = 80;
+        var ab_text = new THREE.Mesh(ab_Geo,textMaterial);
+            text.add(ab_text);
+            ab_text.castShadow = true;
+            ab_text.position.x = 100;        
+
+        text.position.set(-80,0,1);
+        text.rotation.x = 0.5 * Math.PI;
+        scene.add(text);
+
+
+        // Setto le posizioni dei componenti della scena
+        lamp.position.x = -90;
+        lamp.position.y = -20;
+
+        joint1.rotation.z = 1.53 * Math.PI;  // alfa
+        joint1.sphere.rotation.x = .3*Math.PI;  // beta
+        joint2.sphere.rotation.x = .5*Math.PI;  // gamma
+        joint2.rotation.z = 0.95 * Math.PI;  // delta
+        joint3.rotation.x = 0.5*Math.PI;  // epsilon
+
+
+        // Animazioni
+        var posX = lamp.position.x;
+        var posZ = lamp.position.z;
+        var jumpLamp = new KF.KeyFrameAnimator;
+        jumpLamp.init({ 
+            interps:
+                [
+                    {
+                        keys:[0,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,1], 
+                        values: [
+                            { x : posX, z : posZ },
+                            { x : posX+=6, z : posZ+=2.5 }, { x : posX+=6, z : posZ+=2.5 },
+                            { x : posX+=6, z : posZ-=2.5 }, { x : posX+=6, z : posZ-=2.5 },
+                            { x : posX+=6, z : posZ+=2.5 }, { x : posX+=6, z : posZ+=2.5 },
+                            { x : posX+=6, z : posZ-=2.5 }, { x : posX+=6, z : posZ-=2.5 },
+                            { x : posX+=6, z : posZ+=2.5 }, { x : posX+=6, z : posZ+=2.5 },
+                            { x : posX+=6, z : posZ-=2.5 }, { x : posX+=6, z : posZ-=2.5 },
+                            { x : posX+=6, z : posZ+=2.5 }, { x : posX+=6, z : posZ+=2.5 },
+                            { x : posX+=6, z : posZ-=2.5 }, { x : posX+=6, z : posZ-=2.5 },
+                            { x : posX+=6, z : posZ+=1 }, { x : posX+=6, z : posZ-=1 },
+                            { x : posX+=7, z : posZ },
+                        ],
+                        target:lamp.position
+                    },
+                ],
+            loop: false,
+            duration: 5000
+        });
+
+        var bendLamp = new KF.KeyFrameAnimator;
+        bendLamp.init({ 
+            interps:
+                [
+                    {
+                        keys:[0, 0.05, 0.15, 0.2, 0.25, 0.35, 0.4, 0.45, 0.55, 0.6, 0.65, 0.75, 0.8, 1],  
+                        values: [
+                            { x: .3*Math.PI },  { x: 0.2 }, { x: 0.2 },
+                            { x: .3*Math.PI },  { x: 0.2 }, { x: 0.2 },
+                            { x: .3*Math.PI },  { x: 0.2 }, { x: 0.2 },
+                            { x: .3*Math.PI },  { x: 0.2 }, { x: 0.2 },
+                            { x: .3*Math.PI },  { x: .2*Math.PI }  
+                        ],
+                        target: joint1.sphere.rotation
+                    },
+                    {
+                        keys:[0, 0.05, 0.15, 0.2, 0.25, 0.35, 0.4, 0.45, 0.55, 0.6, 0.65, 0.75, 0.8, 1],  
+                        values: [
+                            { x: .5*Math.PI },  { x: 0.2 }, { x: 0.2 },
+                            { x: .5*Math.PI },  { x: 0.2 }, { x: 0.2 },
+                            { x: .5*Math.PI },  { x: 0.2 }, { x: 0.2 },
+                            { x: .5*Math.PI },  { x: 0.2 }, { x: 0.2 },
+                            { x: .5*Math.PI },  { x: .4*Math.PI }  
+                        ],
+                        target: joint2.sphere.rotation
+                    },
+                    {
+                        keys:[0, 0.05, 0.15, 0.2, 0.25, 0.35, 0.4, 0.45, 0.55, 0.6, 0.65, 0.75, 0.8, 1], 
+                        values: [
+                            { x: .4*Math.PI },  { x: 0.5*Math.PI }, { x: 0.5*Math.PI },
+                            { x: .4*Math.PI },  { x: 0.5*Math.PI }, { x: 0.5*Math.PI },
+                            { x: .4*Math.PI },  { x: 0.5*Math.PI }, { x: 0.5*Math.PI },
+                            { x: .4*Math.PI },  { x: 0.5*Math.PI }, { x: 0.5*Math.PI },
+                            { x: .4*Math.PI },  { x: .4*Math.PI }
+                        ],
+                        target: joint3.rotation
+                    },
+                ],
+            loop: false,
+            duration: 5000
+        });
+
+        var lookChar = new TWEEN.Tween(joint1.rotation)
+            .to({ z: [2*Math.PI, 2.2*Math.PI]}, 800)
+            .delay(4500)
+
+        var jumpUpChar = new KF.KeyFrameAnimator;
+        jumpUpChar.init({ 
+            interps:
+                [
+                    {
+                        keys:[0, .7, .90 ,1],   
+                        values: [
+                            { x:25 , y:-20 , z:0 },
+                            { x:25 , y:-20 , z:0 }, 
+                            { x:16 , y:-6 , z:30 },
+                            { x:13 , y:-3 , z:26 }
+                        ],
+                        target: lamp.position
+                    },
+                    {
+                        keys:[0, .5, .6, .9 ,1],   
+                        values: [
+                            { x: .2*Math.PI },
+                            { x: .4*Math.PI }, 
+                            { x: .4*Math.PI },
+                            { x: .2*Math.PI },
+                            { x: .2*Math.PI }
+                        ],
+                        target: joint1.sphere.rotation
+                    },
+                    {
+                        keys:[0, .5, .6, .9 ,1],  
+                        values: [
+                            { x: .4*Math.PI },
+                            { x: .7*Math.PI },
+                            { x: .7*Math.PI },
+                            { x: .4*Math.PI },
+                            { x: .4*Math.PI }
+                        ],
+                        target: joint2.sphere.rotation
+                    },                    
+                ],
+            loop: false,
+            duration: 3000
+        });
+
+        var jumpingUpChar = new KF.KeyFrameAnimator;
+        jumpingUpChar.init({ 
+            interps:
+                [
+                    {
+                        keys:[0, .15, .3, .45, .6, .8, 1],    
+                        values: [
+                            {z: 26}, {z: 35 }, {z: 20 }, {z: 40 }, {z: 10 }, {z: 40 }, {z: 0 }
+                        ],
+                        target: lamp.position
+                    },
+                    {
+                        keys:[0, .15, .25, .3, .33, .45, .52, .6, .69, .8, .87, 1],   
+                        values: [
+                            {y: 1},  {y: 1}, 
+                            {y: 1},  {y: .8},
+                            {y: 1},  {y: 1},
+                            {y: 1},  {y: .4},
+                            {y: 1},  {y: 1},
+                            {y: 1}, {y: 0}
+                        ],
+                        target: l_text.scale
+                    },                
+                ],
+            loop: false,
+            duration: 3000
+        });
+
+        var rotateLamp = new TWEEN.Tween(lamp.rotation)
+            .to({ z: 0.35*Math.PI},1200)
+
+        var lookMe = new KF.KeyFrameAnimator;
+        lookMe.init({ 
+            interps:
+                [
+                    {
+                        keys:[0, .2, .4, .55, .7, 1],    
+                        values: [
+                            {z: .2*Math.PI}, {z: -Math.PI/3}, {z: Math.PI/3}, {z: -Math.PI/6}, 
+                            {z: 0.7*Math.PI}, {z: 0.7*Math.PI}
+                        ],
+                        target: joint1.rotation
+                    },
+                    {
+                        keys:[0, .1, .8, 1],   
+                        values: [
+                            {x: .4*Math.PI}, {x: .6*Math.PI}, {x: .6*Math.PI},  {x: .3*Math.PI}
+                        ],
+                        target: joint3. rotation
+                    },                
+                ],
+            loop: false,
+            duration: 3000
+        });
+
+
+
+        jumpLamp.start(); // faccio saltare la lampadina sul tavolo
+        bendLamp.start(); // la lampada si piega mentre salta
+        lookChar.start(); // la lampadina guarda la l 
+        setTimeout( function() { jumpUpChar.start() } , 5500); // salto da terra sulla lettera
+        setTimeout( function() { rotateLamp.start() } , 7300); // ruoto la lampada mentre salta
+        setTimeout( function() { jumpingUpChar.start() } , 8500); // salto sulla lettera fino a schiacciarla
+        setTimeout(function() { lookMe.start() },12000);
+
+
+
+        // Aggiungo i controlli 
+        var controls = new function() {
+            this.lampPosX = lamp.position.x; // sposto la lampada sull'asse delle x
+            this.lampPosY = lamp.position.y; // sposto la lampada sull'asse delle y
+            this.alfa = joint1.rotation.z; // ruoto il perno alla base su z da 0--2PI
+            this.beta = joint1.sphere.rotation.x; // ruoto il 1° braccio su x da 0--PI/2
+            this.gamma = joint2.sphere.rotation.x; // ruoto il perno in mezzo su x da 0--PI/2
+            this.delta = joint2.rotation.z; // ruoto il 2° braccio su z da 0--2PI
+            this.epsilon = joint3.rotation.x; // ruoto il perno finale su x da 0--PI/2
+            this.trackball = true;
+            this.switchLight = true;
+        };
+
+        // Gestisco i parametri con una GUI
+        var gui = new dat.GUI();
+
+        var shiftLamp = gui.addFolder("Shift-Lamp");
+        shiftLamp.add(controls, "lampPosX", -95.,95.).onChange(function (e) {
+            lamp.position.x = e;
+        });
+        shiftLamp.add(controls, "lampPosY",-45.,45.).onChange(function (e) {
+            lamp.position.y = e;
+        });
+
+        var moveLamp = gui.addFolder("Move-Lamp");
+        moveLamp.add(controls, "alfa",0,2.*Math.PI).onChange(function (e) {
+            joint1.rotation.z = e;
+        });
+        moveLamp.add(controls,"beta", 0, 0.5*Math.PI).onChange(function (e){
+            joint1.sphere.rotation.x = e;
+        });
+        moveLamp.add(controls,"gamma", 0, 0.5*Math.PI).onChange(function (e){
+            joint2.sphere.rotation.x = e;
+        });        
+        moveLamp.add(controls,"delta", 0, 2.*Math.PI).onChange(function (e){
+            joint2.rotation.z = e;
+        });
+        moveLamp.add(controls,"epsilon", 0, 0.5*Math.PI).onChange(function (e){
+            joint3.rotation.x = e;
+        });
+
+
+        var light_control = gui.add(controls,"switchLight");
+        light_control.onChange(function (value) {
+            light.visible = value;
+            pointLight.visible = value;
+            cvd_text.castShadow = value;
+            l_text.castShadow = value;
+            ab_text.castShadow = value;
+        });
+
+
+        var trackball_control = gui.add(controls,"trackball");
+        trackball_control.onChange(function (e) {
+            trackball_control.trackball = e;
+        });
+
+
+
+
+        $('body').append(renderer.domElement);
+        
+        render();
+
+        function render(){
+            stats.update();
+            TWEEN.update();
+            KF.update();
+
+            if (controls.trackball) {
+                trackballControls.update();
+            }           
+            requestAnimationFrame(render);
+            renderer.render(scene, camera);
+        }
+
+       function initStats() {
+        var stats = new Stats();
+        stats.setMode(0); // 0: fps, 1: ms
+        $('body').append(stats.domElement);
+        return stats;
+      } 
+
+      });
+    </script>  
+ </body>
+</html>
