@@ -221,185 +221,186 @@
 
 
         // Animazioni
-        var posX = lamp.position.x;
-        var posZ = lamp.position.z;
-        var jumpLamp = new KF.KeyFrameAnimator;
-        jumpLamp.init({ 
-            interps:
-                [
-                    {
-                        keys:[0,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,1], 
-                        values: [
-                            { x : posX, z : posZ },
-                            { x : posX+=6, z : posZ+=2.5 }, { x : posX+=6, z : posZ+=2.5 },
-                            { x : posX+=6, z : posZ-=2.5 }, { x : posX+=6, z : posZ-=2.5 },
-                            { x : posX+=6, z : posZ+=2.5 }, { x : posX+=6, z : posZ+=2.5 },
-                            { x : posX+=6, z : posZ-=2.5 }, { x : posX+=6, z : posZ-=2.5 },
-                            { x : posX+=6, z : posZ+=2.5 }, { x : posX+=6, z : posZ+=2.5 },
-                            { x : posX+=6, z : posZ-=2.5 }, { x : posX+=6, z : posZ-=2.5 },
-                            { x : posX+=6, z : posZ+=2.5 }, { x : posX+=6, z : posZ+=2.5 },
-                            { x : posX+=6, z : posZ-=2.5 }, { x : posX+=6, z : posZ-=2.5 },
-                            { x : posX+=6, z : posZ+=1 }, { x : posX+=6, z : posZ-=1 },
-                            { x : posX+=7, z : posZ },
-                        ],
-                        target:lamp.position
-                    },
-                ],
-            loop: false,
-            duration: 5000
-        });
+        var animation = function() {
 
-        var bendLamp = new KF.KeyFrameAnimator;
-        bendLamp.init({ 
-            interps:
-                [
-                    {
-                        keys:[0, 0.05, 0.15, 0.2, 0.25, 0.35, 0.4, 0.45, 0.55, 0.6, 0.65, 0.75, 0.8, 1],  
-                        values: [
-                            { x: .3*Math.PI },  { x: 0.2 }, { x: 0.2 },
-                            { x: .3*Math.PI },  { x: 0.2 }, { x: 0.2 },
-                            { x: .3*Math.PI },  { x: 0.2 }, { x: 0.2 },
-                            { x: .3*Math.PI },  { x: 0.2 }, { x: 0.2 },
-                            { x: .3*Math.PI },  { x: .2*Math.PI }  
-                        ],
-                        target: joint1.sphere.rotation
-                    },
-                    {
-                        keys:[0, 0.05, 0.15, 0.2, 0.25, 0.35, 0.4, 0.45, 0.55, 0.6, 0.65, 0.75, 0.8, 1],  
-                        values: [
-                            { x: .5*Math.PI },  { x: 0.2 }, { x: 0.2 },
-                            { x: .5*Math.PI },  { x: 0.2 }, { x: 0.2 },
-                            { x: .5*Math.PI },  { x: 0.2 }, { x: 0.2 },
-                            { x: .5*Math.PI },  { x: 0.2 }, { x: 0.2 },
-                            { x: .5*Math.PI },  { x: .4*Math.PI }  
-                        ],
-                        target: joint2.sphere.rotation
-                    },
-                    {
-                        keys:[0, 0.05, 0.15, 0.2, 0.25, 0.35, 0.4, 0.45, 0.55, 0.6, 0.65, 0.75, 0.8, 1], 
-                        values: [
-                            { x: .4*Math.PI },  { x: 0.5*Math.PI }, { x: 0.5*Math.PI },
-                            { x: .4*Math.PI },  { x: 0.5*Math.PI }, { x: 0.5*Math.PI },
-                            { x: .4*Math.PI },  { x: 0.5*Math.PI }, { x: 0.5*Math.PI },
-                            { x: .4*Math.PI },  { x: 0.5*Math.PI }, { x: 0.5*Math.PI },
-                            { x: .4*Math.PI },  { x: .4*Math.PI }
-                        ],
-                        target: joint3.rotation
-                    },
-                ],
-            loop: false,
-            duration: 5000
-        });
+            var posX = lamp.position.x;
+            var posZ = lamp.position.z;
+            var jumpLamp = new KF.KeyFrameAnimator;
+            jumpLamp.init({ 
+                interps:
+                    [
+                        {
+                            keys:[0,0.05,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,1], 
+                            values: [
+                                { x : posX, z : posZ },
+                                { x : posX+=6, z : posZ+=2.5 }, { x : posX+=6, z : posZ+=2.5 },
+                                { x : posX+=6, z : posZ-=2.5 }, { x : posX+=6, z : posZ-=2.5 },
+                                { x : posX+=6, z : posZ+=2.5 }, { x : posX+=6, z : posZ+=2.5 },
+                                { x : posX+=6, z : posZ-=2.5 }, { x : posX+=6, z : posZ-=2.5 },
+                                { x : posX+=6, z : posZ+=2.5 }, { x : posX+=6, z : posZ+=2.5 },
+                                { x : posX+=6, z : posZ-=2.5 }, { x : posX+=6, z : posZ-=2.5 },
+                                { x : posX+=6, z : posZ+=2.5 }, { x : posX+=6, z : posZ+=2.5 },
+                                { x : posX+=6, z : posZ-=2.5 }, { x : posX+=6, z : posZ-=2.5 },
+                                { x : posX+=6, z : posZ+=1 }, { x : posX+=6, z : posZ-=1 },
+                                { x : posX+=7, z : posZ },
+                            ],
+                            target:lamp.position
+                        },
+                    ],
+                loop: false,
+                duration: 5000
+            });
 
-        var lookChar = new TWEEN.Tween(joint1.rotation)
-            .to({ z: [2*Math.PI, 2.2*Math.PI]}, 800)
-            .delay(4500)
+            var bendLamp = new KF.KeyFrameAnimator;
+            bendLamp.init({ 
+                interps:
+                    [
+                        {
+                            keys:[0, 0.05, 0.15, 0.2, 0.25, 0.35, 0.4, 0.45, 0.55, 0.6, 0.65, 0.75, 0.8, 1],  
+                            values: [
+                                { x: .3*Math.PI },  { x: 0.2 }, { x: 0.2 },
+                                { x: .3*Math.PI },  { x: 0.2 }, { x: 0.2 },
+                                { x: .3*Math.PI },  { x: 0.2 }, { x: 0.2 },
+                                { x: .3*Math.PI },  { x: 0.2 }, { x: 0.2 },
+                                { x: .3*Math.PI },  { x: .2*Math.PI }  
+                            ],
+                            target: joint1.sphere.rotation
+                        },
+                        {
+                            keys:[0, 0.05, 0.15, 0.2, 0.25, 0.35, 0.4, 0.45, 0.55, 0.6, 0.65, 0.75, 0.8, 1],  
+                            values: [
+                                { x: .5*Math.PI },  { x: 0.2 }, { x: 0.2 },
+                                { x: .5*Math.PI },  { x: 0.2 }, { x: 0.2 },
+                                { x: .5*Math.PI },  { x: 0.2 }, { x: 0.2 },
+                                { x: .5*Math.PI },  { x: 0.2 }, { x: 0.2 },
+                                { x: .5*Math.PI },  { x: .4*Math.PI }  
+                            ],
+                            target: joint2.sphere.rotation
+                        },
+                        {
+                            keys:[0, 0.05, 0.15, 0.2, 0.25, 0.35, 0.4, 0.45, 0.55, 0.6, 0.65, 0.75, 0.8, 1], 
+                            values: [
+                                { x: .4*Math.PI },  { x: 0.5*Math.PI }, { x: 0.5*Math.PI },
+                                { x: .4*Math.PI },  { x: 0.5*Math.PI }, { x: 0.5*Math.PI },
+                                { x: .4*Math.PI },  { x: 0.5*Math.PI }, { x: 0.5*Math.PI },
+                                { x: .4*Math.PI },  { x: 0.5*Math.PI }, { x: 0.5*Math.PI },
+                                { x: .4*Math.PI },  { x: .4*Math.PI }
+                            ],
+                            target: joint3.rotation
+                        },
+                    ],
+                loop: false,
+                duration: 5000
+            });
 
-        var jumpUpChar = new KF.KeyFrameAnimator;
-        jumpUpChar.init({ 
-            interps:
-                [
-                    {
-                        keys:[0, .7, .90 ,1],   
-                        values: [
-                            { x:25 , y:-20 , z:0 },
-                            { x:25 , y:-20 , z:0 }, 
-                            { x:16 , y:-6 , z:30 },
-                            { x:13 , y:-3 , z:26 }
-                        ],
-                        target: lamp.position
-                    },
-                    {
-                        keys:[0, .5, .6, .9 ,1],   
-                        values: [
-                            { x: .2*Math.PI },
-                            { x: .4*Math.PI }, 
-                            { x: .4*Math.PI },
-                            { x: .2*Math.PI },
-                            { x: .2*Math.PI }
-                        ],
-                        target: joint1.sphere.rotation
-                    },
-                    {
-                        keys:[0, .5, .6, .9 ,1],  
-                        values: [
-                            { x: .4*Math.PI },
-                            { x: .7*Math.PI },
-                            { x: .7*Math.PI },
-                            { x: .4*Math.PI },
-                            { x: .4*Math.PI }
-                        ],
-                        target: joint2.sphere.rotation
-                    },                    
-                ],
-            loop: false,
-            duration: 3000
-        });
+            var lookChar = new TWEEN.Tween(joint1.rotation)
+                .to({ z: [2*Math.PI, 2.2*Math.PI]}, 800)
+                .delay(4500)
 
-        var jumpingUpChar = new KF.KeyFrameAnimator;
-        jumpingUpChar.init({ 
-            interps:
-                [
-                    {
-                        keys:[0, .15, .3, .45, .6, .8, 1],    
-                        values: [
-                            {z: 26}, {z: 35 }, {z: 20 }, {z: 40 }, {z: 10 }, {z: 40 }, {z: 0 }
-                        ],
-                        target: lamp.position
-                    },
-                    {
-                        keys:[0, .15, .25, .3, .33, .45, .52, .6, .69, .8, .87, 1],   
-                        values: [
-                            {y: 1},  {y: 1}, 
-                            {y: 1},  {y: .8},
-                            {y: 1},  {y: 1},
-                            {y: 1},  {y: .4},
-                            {y: 1},  {y: 1},
-                            {y: 1}, {y: 0}
-                        ],
-                        target: l_text.scale
-                    },                
-                ],
-            loop: false,
-            duration: 3000
-        });
+            var jumpUpChar = new KF.KeyFrameAnimator;
+            jumpUpChar.init({ 
+                interps:
+                    [
+                        {
+                            keys:[0, .7, .90 ,1],   
+                            values: [
+                                { x:25 , y:-20 , z:0 },
+                                { x:25 , y:-20 , z:0 }, 
+                                { x:16 , y:-6 , z:30 },
+                                { x:13 , y:-3 , z:26 }
+                            ],
+                            target: lamp.position
+                        },
+                        {
+                            keys:[0, .5, .6, .9 ,1],   
+                            values: [
+                                { x: .2*Math.PI },
+                                { x: .4*Math.PI }, 
+                                { x: .4*Math.PI },
+                                { x: .2*Math.PI },
+                                { x: .2*Math.PI }
+                            ],
+                            target: joint1.sphere.rotation
+                        },
+                        {
+                            keys:[0, .5, .6, .9 ,1],  
+                            values: [
+                                { x: .4*Math.PI },
+                                { x: .7*Math.PI },
+                                { x: .7*Math.PI },
+                                { x: .4*Math.PI },
+                                { x: .4*Math.PI }
+                            ],
+                            target: joint2.sphere.rotation
+                        },                    
+                    ],
+                loop: false,
+                duration: 3000
+            });
 
-        var rotateLamp = new TWEEN.Tween(lamp.rotation)
-            .to({ z: 0.35*Math.PI},1200)
+            var jumpingUpChar = new KF.KeyFrameAnimator;
+            jumpingUpChar.init({ 
+                interps:
+                    [
+                        {
+                            keys:[0, .15, .3, .45, .6, .8, 1],    
+                            values: [
+                                {z: 26}, {z: 35 }, {z: 20 }, {z: 40 }, {z: 10 }, {z: 40 }, {z: 0 }
+                            ],
+                            target: lamp.position
+                        },
+                        {
+                            keys:[0, .15, .25, .3, .33, .45, .52, .6, .69, .8, .87, 1],   
+                            values: [
+                                {y: 1},  {y: 1}, 
+                                {y: 1},  {y: .8},
+                                {y: 1},  {y: 1},
+                                {y: 1},  {y: .4},
+                                {y: 1},  {y: 1},
+                                {y: 1}, {y: 0}
+                            ],
+                            target: l_text.scale
+                        },                
+                    ],
+                loop: false,
+                duration: 3000
+            });
 
-        var lookMe = new KF.KeyFrameAnimator;
-        lookMe.init({ 
-            interps:
-                [
-                    {
-                        keys:[0, .2, .4, .55, .7, 1],    
-                        values: [
-                            {z: .2*Math.PI}, {z: -Math.PI/3}, {z: Math.PI/3}, {z: -Math.PI/6}, 
-                            {z: 0.7*Math.PI}, {z: 0.7*Math.PI}
-                        ],
-                        target: joint1.rotation
-                    },
-                    {
-                        keys:[0, .1, .8, 1],   
-                        values: [
-                            {x: .4*Math.PI}, {x: .6*Math.PI}, {x: .6*Math.PI},  {x: .3*Math.PI}
-                        ],
-                        target: joint3. rotation
-                    },                
-                ],
-            loop: false,
-            duration: 3000
-        });
+            var rotateLamp = new TWEEN.Tween(lamp.rotation)
+                .to({ z: 0.35*Math.PI},1200)
 
+            var lookMe = new KF.KeyFrameAnimator;
+            lookMe.init({ 
+                interps:
+                    [
+                        {
+                            keys:[0, .2, .4, .55, .7, 1],    
+                            values: [
+                                {z: .2*Math.PI}, {z: -Math.PI/3}, {z: Math.PI/3}, {z: -Math.PI/6}, 
+                                {z: 0.7*Math.PI}, {z: 0.7*Math.PI}
+                            ],
+                            target: joint1.rotation
+                        },
+                        {
+                            keys:[0, .1, .8, 1],   
+                            values: [
+                                {x: .4*Math.PI}, {x: .6*Math.PI}, {x: .6*Math.PI},  {x: .3*Math.PI}
+                            ],
+                            target: joint3. rotation
+                        },                
+                    ],
+                loop: false,
+                duration: 3000
+            });
 
-
-        jumpLamp.start(); // faccio saltare la lampadina sul tavolo
-        bendLamp.start(); // la lampada si piega mentre salta
-        lookChar.start(); // la lampadina guarda la l 
-        setTimeout( function() { jumpUpChar.start() } , 5500); // salto da terra sulla lettera
-        setTimeout( function() { rotateLamp.start() } , 7300); // ruoto la lampada mentre salta
-        setTimeout( function() { jumpingUpChar.start() } , 8500); // salto sulla lettera fino a schiacciarla
-        setTimeout(function() { lookMe.start() },12000);
+            jumpLamp.start(); // faccio saltare la lampadina sul tavolo
+            bendLamp.start(); // la lampada si piega mentre salta
+            lookChar.start(); // la lampadina guarda la l 
+            setTimeout( function() { jumpUpChar.start() } , 5500); // salto da terra sulla lettera
+            setTimeout( function() { rotateLamp.start() } , 7300); // ruoto la lampada mentre salta
+            setTimeout( function() { jumpingUpChar.start() } , 8500); // salto sulla lettera fino a schiacciarla
+            setTimeout(function() { lookMe.start() },12000);
+        }
 
 
 
@@ -414,6 +415,19 @@
             this.epsilon = joint3.rotation.x; // ruoto il perno finale su x da 0--PI/2
             this.trackball = true;
             this.switchLight = true;
+            this.animated = function() {
+                lamp.position.x = -90;
+                lamp.position.y = -20;
+
+                joint1.rotation.z = 1.53 * Math.PI;  // alfa
+                joint1.sphere.rotation.x = .3*Math.PI;  // beta
+                joint2.sphere.rotation.x = .5*Math.PI;  // gamma
+                joint2.rotation.z = 0.95 * Math.PI;  // delta
+                joint3.rotation.x = 0.5*Math.PI;  // epsilol
+                l_text.scale.y = 1;
+
+                animation();
+            }
         };
 
         // Gestisco i parametri con una GUI
@@ -459,6 +473,8 @@
         trackball_control.onChange(function (e) {
             trackball_control.trackball = e;
         });
+
+        gui.add(controls,"animated");
 
 
 
