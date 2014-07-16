@@ -2,28 +2,28 @@ from pyplasm import *
 
 """ Funzioni che generano griglie per facilitare la traslazione e la rotazione di figure """
 # funzione che ritorna una griglia bidimensionale sul piano XY; parametri: unita' di misura e dimensione per l'estensione
-def F_griglia2DXY(unita,dimensione):
+def F_griglia2DXY(unita,dimensione=1):
 	u = SKEL_1 ( PROD([QUOTE([unita,unita]*dimensione),QUOTE([unita,unita]*dimensione)]) )
 	return COLOR(BLACK)(T([1,2])([-dimensione,-dimensione])(u))
 
 # funzione che ritorna una griglia bidimensionale sul piano XZ; parametri: unita' di misura e dimensione per l'estensione
-def F_griglia2DXZ(unita,dimensione):
+def F_griglia2DXZ(unita,dimensione=1):
 	supp = F_griglia2DXY(unita,dimensione)
 	return R([2,3])(0.5*PI)(supp)
 
 # funzione che ritorna una griglia bidimensionale sul piano YZ; parametri: unita' di misura e dimensione per l'estensione
-def F_griglia2DYZ(unita,dimensione):
+def F_griglia2DYZ(unita,dimensione=1):
 	supp = F_griglia2DXY(unita,dimensione)
 	return R([1,3])(0.5*PI)(supp)
 
 # funzione che ritorna una griglia tridimensionale; parametri: unita' di misura e dimensione per l'estensione
-def F_griglia3D(unita,dimensione):
+def F_griglia3D(unita,dimensione=1):
 	u = PROD([QUOTE([unita,unita]*dimensione),QUOTE([unita,unita]*dimensione)])
 	u = SKEL_1 ( PROD([u,QUOTE([unita,unita]*dimensione)]) )
 	return COLOR(BLACK)(T([1,2,3])([-dimensione,-dimensione,-dimensione])(u))
 
 # Funzione che ritorna una griglia su i piani xy, xz e yz: parametri unita' di misura e dimensione dell'estensione 
-def F_griglia3DS(unita,dimensione):
+def F_griglia3DS(unita,dimensione=1):
 	xy = F_griglia2DXY(unita,dimensione)
 	xz = F_griglia2DXZ(unita,dimensione)
 	yz = F_griglia2DYZ(unita,dimensione)
@@ -39,35 +39,50 @@ def F_spessore(obj,spessoreX,spessoreY,spessoreZ):
 def F_estrude(obj,spessore):
 	return PROD([obj,Q(spessore)])
 
+#funzione che presa una lista di punti su un piano ritorna una lista di punti nello spazio
+# parametri: la lista dei punti, l'asse da aggiungere, il valore da assegnare 
+def F_addValue(punti,asse='z',value=0):
+	result = []
+	for p in punti:
+		if asse == 'x' :
+				p = [value,p[0],p[1]]				
+		elif asse == 'y':
+				p = [p[0],value,p[1]]
+		elif asse =='z':
+				p = [p[0],p[1],value]
+		result.append(p)					
+	return result
+
+
 """ Funzioni che lavorano su elementi circolari o geometrici  """
 # funzione che ritorna il perimetro di un disco; parametri: raggio del disco, numero dei lati e i radianti
-def F_circonferenza(raggio,lati,rad): 
+def F_circonferenza(raggio,lati=20,rad=2): 
 	def f(p):
 		return [raggio*COS(p[0]),raggio*SIN(p[0])]
 	return MAP(f)(INTERVALS(rad*PI)(lati))
 
 # funzione che ritorna un disco pieno; parametri: raggio del disco, numero dei lati, radianti da coprire
-def F_disco(raggio,lati,rad):
+def F_disco(raggio,lati=20,rad=2):
 	def f(p):
 		u,v = p
 		return [v*raggio*COS(u),v*raggio*SIN(u)]
 	return MAP(f)(PROD([INTERVALS(rad*PI)(lati), INTERVALS(1)(1)]))
 
 # funzione che ritorna un'ellisse; parametri: dimensione del raggio lungo X, dimensione del raggio lungo Y, # dei lati e  radianti
-def F_ellisse1(raggioX,raggioY,lati,rad):
+def F_ellisse1(raggioX,raggioY,lati=20,rad=2):
 	def f(p):
 		return [raggioX*COS(p[0]),raggioY*SIN(p[0])]
 	return MAP(f)(INTERVALS(rad*PI)(lati))
 
 # funzione che ritorna un ellisse piena; parametri: dimensione del raggio lungo X, dimensione del raggio lungo Y, # dei lati e  radianti
-def F_ellisse2(raggioX,raggioY,lati,rad):
+def F_ellisse2(raggioX,raggioY,lati=20,rad=2):
 	def f(p):
 		u,v = p
 		return [v*raggioX*COS(u),v*raggioY*SIN(u)]
 	return MAP(f)(PROD([INTERVALS(rad*PI)(lati), INTERVALS(1)(1)]))
 
 # funzione che ritorna un anello; parametri: raggio esterno dell'anello, raggio interno dell'anello e i lati
-def F_anello(raggioEsterno, raggioInterno, lati):
+def F_anello(raggioEsterno, raggioInterno, lati=20):
 	discoEsterno = F_disco(raggioEsterno,lati,2)
 	discoInterno = F_disco(raggioInterno,lati,2)
 	return DIFFERENCE([discoEsterno,discoInterno])
@@ -121,3 +136,10 @@ def F_portaArco(raggio,altezza):
 	arco = T([1,3])([raggio,altezza])(F_arco(raggio))
 	quadro = CUBOID([raggio*2,0,altezza])
 	return STRUCT([quadro,arco])
+
+
+""" Funzioni utili per la generazione di curve """
+#Funzione che ritorna una curva generata con Bezier
+def F_bezier(points):
+	profile =BEZIER(S1)(points)
+	return MAP(profile)(INTERVALS(1)(32))

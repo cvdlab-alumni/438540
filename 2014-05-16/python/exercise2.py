@@ -34,5 +34,5 @@ palazzo = STRUCT([ pianoT,piano1,piano2,piano3,piano4,tetto, T([1,2,3])([1400,80
 
 palazzo = COLOR([.8,.8,.8])(palazzo)
 
-#VIEW(palazzo)
+VIEW(palazzo)
 #VIEW(SKEL_1(palazzo))

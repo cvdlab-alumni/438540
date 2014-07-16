@@ -161,5 +161,7 @@ master = master[0], [cell for k,cell in enumerate(master[1]) if not (k in toRemo
 
 
 #ViewHpc(master)
-#DRAW(master)
+#DRAW2(master)
+DRAW(master)
+
 internoCentrale = master

@@ -3,14 +3,13 @@ import collections
 from simplexn import *
 import numpy as np
 
-import sys
-sys.path.insert(0, 'lib/py/')
+import sys; sys.path.insert(0, 'lib/py/')
 import larcc
 from larcc import *
 
 def larSplit(dom):
     def larSplit1(n):
-        assert n > 0 and type(n) == int
+        # assert n > 0 and isinstance(n,int)
         item = float(dom)/n
         ints = range(n+1)
         items = [item]*(n+1)
@@ -83,7 +82,7 @@ def larCuboids(shape, full=False):
       cells = gridMap(len(shape))
    else:
       skeletonIds = range(len(shape)+1)
-      cells = CAT([ gridMap(id) for id in skeletonIds ])
+      cells = [ gridMap(id) for id in skeletonIds ]
    return vertGrid, cells
 
 def gridSkeletons(shape):
@@ -128,10 +127,35 @@ def larModelProduct(twoModels):
     model = [list(v) for v in vertices.keys()], cells
     return model
 
+""" Simplicial face stack computation """
+def larSimplicialStack(simplices):
+   dim = len(simplices[0])-1
+   faceStack = [simplices]
+   for k in range(dim):
+      faces = larSimplexFacets(faceStack[-1])
+      faceStack.append(faces)
+   return REVERSE(faceStack)
+
+""" Extraction of facets from cuboidal complexes """
+def larCuboidsFacets((V,cells)):
+   dim = len(V[0])
+   n = int(2**(dim-1))
+   facets = []
+   for cell in cells:
+      coords = [AR([V[v],v]) for v in cell] # decorate coords with vertex index
+      doubleFacets = [sorted(coords,key=(lambda x: x[k])) for k in range(dim)]
+      facets += AA(AA(LAST))(CAT([[pair[:n],pair[n:]] for pair in doubleFacets]))
+   facets = AA(eval)(set(AA(str)(facets))) # remove duplicates
+   return V,sorted(facets)
+
+if __name__ == "__main__":
+   VIEW(EXPLODE(1.2,1.2,1.2)(MKPOLS(larCuboidsFacets(larCuboids([3,3,3])))))
+
 if __name__=="__main__":
-   VIEW(EXPLODE(1.5,1.5,1.5)(MKPOLS(larCuboids([3],True))))
-   VIEW(EXPLODE(1.5,1.5,1.5)(MKPOLS(larCuboids([3,2],True))))
-   VIEW(EXPLODE(1.5,1.5,1.5)(MKPOLS(larCuboids([3,2,1],True))))
+   def mergeSkeletons(larSkeletons): return larSkeletons[0],CAT(larSkeletons[1])
+   VIEW(EXPLODE(1.5,1.5,1.5)(MKPOLS(mergeSkeletons(larCuboids([3],True)))))
+   VIEW(EXPLODE(1.5,1.5,1.5)(MKPOLS(mergeSkeletons(larCuboids([3,2],True)))))
+   VIEW(EXPLODE(1.5,1.5,1.5)(MKPOLS(mergeSkeletons(larCuboids([3,2,1],True)))))
    
    if __name__ == "__main__":
        geom_0,topol_0 = [[0.],[1.],[2.],[3.],[4.]],[[0,1],[1,2],[2,3],[3,4]]

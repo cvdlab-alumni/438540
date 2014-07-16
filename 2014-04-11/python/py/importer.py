@@ -1,5 +1,5 @@
+from architectural import *
 from boolean import *
-from boolean2 import *
 from lar2psm import *
 from larcc import *
 from largrid import *
@@ -8,4 +8,6 @@ from morph import *
 from myfont import *
 from simplexn import *
 from pyplasm import *
+from splines import *
+from sysml import *
 from funzioni_pyplasm import *
